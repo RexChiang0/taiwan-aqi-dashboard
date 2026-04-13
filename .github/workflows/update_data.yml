@@ -2,7 +2,7 @@ name: Hourly AQI Update
 
 on:
   schedule:
-    - cron: '0 * * * *' # 每小時執行一次
+    - cron: '27 * * * *' # 每小時執行一次
   workflow_dispatch:      # 允許我們手動點擊按鈕來測試
 
 jobs:
