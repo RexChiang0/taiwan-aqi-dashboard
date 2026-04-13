@@ -28,19 +28,40 @@ df = load_data()
 latest_time = df['publishtime'].max()
 df_latest = df[df['publishtime'] == latest_time]
 
+# ================= 3. 側邊欄篩選器 (Sidebar Controls) =================
+st.sidebar.header("🔍 篩選與設定")
+
+# 篩選一：縣市選擇 (多選)
+all_counties = sorted(df_latest['county'].unique())
+selected_counties = st.sidebar.multiselect(
+    "選擇顯示縣市：", 
+    all_counties, 
+    default=all_counties # 預設全選
+)
+
+# 篩選二：AQI 門檻 (滑桿)
+aqi_threshold = st.sidebar.slider("只顯示 AQI 大於：", 0, 200, 0)
+
+# --- 執行篩選邏輯 ---
+# 根據選中的縣市與 AQI 門檻過濾資料
+mask = (df_latest['county'].isin(selected_counties)) & (df_latest['aqi'] >= aqi_threshold)
+df_filtered = df_latest[mask]
+# =====================================================================
+
 st.write(f"🔄 資料最後更新時間: **{latest_time}**")
+st.write(f"💡 目前顯示 **{len(df_filtered)}** 個符合條件的測站")
 st.divider() # 畫一條分隔線
 
 # ================= 1. 台灣空氣品質分佈地圖 =================
 st.subheader("🗺️ 全台即時空氣品質分佈圖")
 
 # 確保經緯度是數字格式
-df_latest['longitude'] = pd.to_numeric(df_latest['longitude'], errors='coerce')
-df_latest['latitude'] = pd.to_numeric(df_latest['latitude'], errors='coerce')
+df_filtered['longitude'] = pd.to_numeric(df_filtered['longitude'], errors='coerce')
+df_filtered['latitude'] = pd.to_numeric(df_filtered['latitude'], errors='coerce')
 
 # 使用 Plotly 畫出地圖
 fig_map = px.scatter_mapbox(
-    df_latest, 
+    df_filtered, 
     lat="latitude", 
     lon="longitude", 
     color="aqi",            # 顏色根據 AQI 變化
@@ -63,7 +84,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("🚨 全台空氣品質最差 Top 10 測站")
-    worst_10 = df_latest.sort_values(by='aqi', ascending=False).head(10)
+    worst_10 = df_filtered.sort_values(by='aqi', ascending=False).head(10)
     fig_bar = px.bar(worst_10, x='sitename', y='aqi', color='aqi', 
                  color_continuous_scale='Reds', text_auto=True,
                  labels={'sitename': '測站名稱', 'aqi': '空氣品質指標 (AQI)'})
@@ -72,10 +93,12 @@ with col1:
 with col2:
     st.subheader("📊 最新詳細數據表 (可點擊排序)")
     st.dataframe(
-        df_latest[['county', 'sitename', 'aqi', 'pm2.5']].sort_values(by='aqi', ascending=False), 
+        df_filtered[['county', 'sitename', 'aqi', 'pm2.5']].sort_values(by='aqi', ascending=False), 
         height=400, 
         use_container_width=True
     )
+st.divider()
+
 
 # ================= 2. 縣市平均值進階運算 (Data Aggregation) =================
 st.subheader("📊 各縣市空氣品質平均值")
@@ -84,7 +107,7 @@ st.subheader("📊 各縣市空氣品質平均值")
 # 1. 依照 'county' (縣市) 分組
 # 2. 針對 'aqi' 欄位計算平均值 (mean)
 # 3. reset_index() 是為了讓結果變回乾淨的表格
-df_county_avg = df_latest.groupby('county')['aqi'].mean().reset_index()
+df_county_avg = df_filtered.groupby('county')['aqi'].mean().reset_index()
 
 # 為了美觀，我們將平均值四捨五入到小數點第一位
 df_county_avg['aqi'] = df_county_avg['aqi'].round(1)
