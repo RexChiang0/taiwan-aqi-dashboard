@@ -31,6 +31,31 @@ df_latest = df[df['publishtime'] == latest_time]
 st.write(f"🔄 資料最後更新時間: **{latest_time}**")
 st.divider() # 畫一條分隔線
 
+# ================= 1. 台灣空氣品質分佈地圖 =================
+st.subheader("🗺️ 全台即時空氣品質分佈圖")
+
+# 確保經緯度是數字格式
+df_latest['longitude'] = pd.to_numeric(df_latest['longitude'], errors='coerce')
+df_latest['latitude'] = pd.to_numeric(df_latest['latitude'], errors='coerce')
+
+# 使用 Plotly 畫出地圖
+fig_map = px.scatter_mapbox(
+    df_latest, 
+    lat="latitude", 
+    lon="longitude", 
+    color="aqi",            # 顏色根據 AQI 變化
+    size="aqi",             # 點的大小也根據 AQI 變化
+    hover_name="sitename",  # 滑鼠移上去顯示測站名稱
+    hover_data=["county", "aqi", "pm2.5"], 
+    color_continuous_scale=px.colors.sequential.Reds, # 使用紅色漸層
+    zoom=6.5,               # 設定初始縮放倍率
+    height=500,
+    mapbox_style="open-street-map" # 使用免金鑰的開放地圖
+)
+
+st.plotly_chart(fig_map, use_container_width=True)
+st.divider() 
+# =========================================================
 
 # 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
 col1, col2 = st.columns(2)

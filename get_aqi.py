@@ -17,8 +17,8 @@ if response.status_code == 200:
     print("2. 🔪 資料抓取成功！交給 Pandas 整理成表格...")
     df = pd.DataFrame(data)
     
-    # 我們只需要這五個欄位，其他的丟掉，保持資料庫輕量乾淨
-    columns_to_keep = ['sitename', 'county', 'aqi', 'pm2.5', 'publishtime']
+    # 我們只需要這幾個欄位，其他的丟掉，保持資料庫輕量乾淨
+    columns_to_keep = ['sitename', 'county', 'aqi', 'pm2.5', 'publishtime', 'longitude', 'latitude']
     df_clean = df[columns_to_keep]
     
     print("\n--- 整理好的前五筆資料長這樣 ---")
