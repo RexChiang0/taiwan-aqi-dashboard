@@ -57,8 +57,28 @@ st.plotly_chart(fig_map, use_container_width=True)
 st.divider() 
 # =========================================================
 
+
+# 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("🚨 全台空氣品質最差 Top 10 測站")
+    worst_10 = df_latest.sort_values(by='aqi', ascending=False).head(10)
+    fig_bar = px.bar(worst_10, x='sitename', y='aqi', color='aqi', 
+                 color_continuous_scale='Reds', text_auto=True,
+                 labels={'sitename': '測站名稱', 'aqi': '空氣品質指標 (AQI)'})
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+with col2:
+    st.subheader("📊 最新詳細數據表 (可點擊排序)")
+    st.dataframe(
+        df_latest[['county', 'sitename', 'aqi', 'pm2.5']].sort_values(by='aqi', ascending=False), 
+        height=400, 
+        use_container_width=True
+    )
+
 # ================= 2. 縣市平均值進階運算 (Data Aggregation) =================
-st.subheader("📊 各縣市空氣品質平均值 (進階運算)")
+st.subheader("📊 各縣市空氣品質平均值")
 
 # 使用 Pandas 強大的 groupby 功能：
 # 1. 依照 'county' (縣市) 分組
@@ -87,25 +107,6 @@ fig_county = px.bar(
 st.plotly_chart(fig_county, use_container_width=True)
 st.divider()
 # =========================================================================
-
-# 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("🚨 全台空氣品質最差 Top 10 測站")
-    worst_10 = df_latest.sort_values(by='aqi', ascending=False).head(10)
-    fig_bar = px.bar(worst_10, x='sitename', y='aqi', color='aqi', 
-                 color_continuous_scale='Reds', text_auto=True,
-                 labels={'sitename': '測站名稱', 'aqi': '空氣品質指標 (AQI)'})
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-with col2:
-    st.subheader("📊 最新詳細數據表 (可點擊排序)")
-    st.dataframe(
-        df_latest[['county', 'sitename', 'aqi', 'pm2.5']].sort_values(by='aqi', ascending=False), 
-        height=400, 
-        use_container_width=True
-    )
 
 
 # ================= 新增：歷史趨勢查詢區塊 =================
