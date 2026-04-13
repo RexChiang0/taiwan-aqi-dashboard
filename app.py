@@ -28,25 +28,6 @@ df_latest = df[df['publishtime'] == latest_time]
 st.write(f"🔄 資料最後更新時間: **{latest_time}**")
 st.divider() # 畫一條分隔線
 
-# ================= 新增：歷史趨勢查詢區塊 =================
-st.subheader("📈 單一測站歷史趨勢查詢")
-
-# 建立一個下拉式選單，把所有測站名稱列出來讓使用者選
-station_list = df['sitename'].unique()
-selected_station = st.selectbox("請選擇您想查詢的測站：", station_list)
-
-# 從大表格中，只篩選出使用者選到的那個測站的資料
-df_station = df[df['sitename'] == selected_station]
-
-# 畫出折線圖
-fig_line = px.line(df_station, x='publishtime', y='aqi', 
-                   title=f"{selected_station} 測站 AQI 歷史趨勢",
-                   markers=True, # 顯示資料點
-                   labels={'publishtime': '更新時間', 'aqi': '空氣品質指標 (AQI)'})
-st.plotly_chart(fig_line, use_container_width=True)
-
-st.divider() # 再畫一條分隔線
-# =========================================================
 
 # 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
 col1, col2 = st.columns(2)
@@ -66,3 +47,24 @@ with col2:
         height=400, 
         use_container_width=True
     )
+
+
+# ================= 新增：歷史趨勢查詢區塊 =================
+st.subheader("📈 單一測站歷史趨勢查詢")
+
+# 建立一個下拉式選單，把所有測站名稱列出來讓使用者選
+station_list = df['sitename'].unique()
+selected_station = st.selectbox("請選擇您想查詢的測站：", station_list)
+
+# 從大表格中，只篩選出使用者選到的那個測站的資料
+df_station = df[df['sitename'] == selected_station]
+
+# 畫出折線圖
+fig_line = px.line(df_station, x='publishtime', y='aqi', 
+                   title=f"{selected_station} 測站 AQI 歷史趨勢",
+                   markers=True, # 顯示資料點
+                   labels={'publishtime': '更新時間', 'aqi': '空氣品質指標 (AQI)'})
+st.plotly_chart(fig_line, use_container_width=True)
+
+st.divider() # 再畫一條分隔線
+# =========================================================
