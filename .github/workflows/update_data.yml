@@ -1,0 +1,36 @@
+name: Hourly AQI Update
+
+on:
+  schedule:
+    - cron: '0 * * * *' # 每小時執行一次
+  workflow_dispatch:      # 允許我們手動點擊按鈕來測試
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # 允許機器人把更新後的資料庫傳回倉庫
+    steps:
+      - name: 複製倉庫內容
+        uses: actions/checkout@v3
+
+      - name: 設定 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安裝必要套件
+        run: pip install requests pandas
+
+      - name: 執行抓取程式
+        env:
+          MY_API_KEY: ${{ secrets.ENV_API_KEY }} # 讀取保險箱裡的 Key
+        run: python get_aqi.py
+
+      - name: 將更新後的資料庫存回 GitHub
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add taiwan_aqi.db
+          git commit -m "自動更新空氣品質數據: $(date)" || exit 0
+          git push
