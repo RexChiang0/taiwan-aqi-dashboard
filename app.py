@@ -5,7 +5,7 @@ import plotly.express as px
 
 # 1. 餐廳裝潢：設定網頁標題與版面寬度
 st.set_page_config(page_title="台灣空氣品質追蹤", layout="wide")
-st.title("🇹🇼 台灣空氣品質即時儀表板")
+st.title("TW 台灣空氣品質即時儀表板")
 
 # 2. 去冰箱拿菜：從資料庫讀取所有歷史資料
 def load_data():
@@ -56,6 +56,37 @@ fig_map = px.scatter_mapbox(
 st.plotly_chart(fig_map, use_container_width=True)
 st.divider() 
 # =========================================================
+
+# ================= 2. 縣市平均值進階運算 (Data Aggregation) =================
+st.subheader("📊 各縣市空氣品質平均值 (進階運算)")
+
+# 使用 Pandas 強大的 groupby 功能：
+# 1. 依照 'county' (縣市) 分組
+# 2. 針對 'aqi' 欄位計算平均值 (mean)
+# 3. reset_index() 是為了讓結果變回乾淨的表格
+df_county_avg = df_latest.groupby('county')['aqi'].mean().reset_index()
+
+# 為了美觀，我們將平均值四捨五入到小數點第一位
+df_county_avg['aqi'] = df_county_avg['aqi'].round(1)
+
+# 將結果依照 AQI 由大到小排序 (最差的在前)
+df_county_avg = df_county_avg.sort_values(by='aqi', ascending=False)
+
+# 畫出縣市平均值的長條圖
+fig_county = px.bar(
+    df_county_avg, 
+    x='county', 
+    y='aqi', 
+    color='aqi',
+    title="全台各縣市平均 AQI 排行",
+    color_continuous_scale='OrRd', # 使用橘紅色系
+    text_auto=True,
+    labels={'county': '縣市', 'aqi': '平均 AQI'}
+)
+
+st.plotly_chart(fig_county, use_container_width=True)
+st.divider()
+# =========================================================================
 
 # 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
 col1, col2 = st.columns(2)
