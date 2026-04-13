@@ -10,9 +10,12 @@ st.title("🇹🇼 台灣空氣品質即時儀表板")
 # 2. 去冰箱拿菜：從資料庫讀取所有歷史資料
 def load_data():
     conn = sqlite3.connect('taiwan_aqi.db')
-    # 這次我們把整座冰箱的資料都拿出來
     df = pd.read_sql("SELECT * FROM aqi_records", conn)
     conn.close()
+    
+    # 清除重複的資料！
+    # 規則：如果「測站名稱 (sitename)」和「發布時間 (publishtime)」都一樣，就只保留第一筆
+    df = df.drop_duplicates(subset=['sitename', 'publishtime'], keep='first')
     
     df['aqi'] = pd.to_numeric(df['aqi'], errors='coerce')
     df['pm2.5'] = pd.to_numeric(df['pm2.5'], errors='coerce')
