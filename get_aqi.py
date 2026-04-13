@@ -3,7 +3,7 @@ import pandas as pd
 import sqlite3
 
 # 1. 換回你的 API Key
-API_KEY = "f1fb06c3-08a8-433a-a9cd-c6466b9809a9"
+API_KEY = ""
 url = f"https://data.moenv.gov.tw/api/v2/aqx_p_432?api_key={API_KEY}"
 
 print("1. 🚚 正在向環境部索取最新空氣資料...")
