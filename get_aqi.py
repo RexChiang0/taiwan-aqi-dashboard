@@ -1,9 +1,10 @@
+import os
 import requests
 import pandas as pd
 import sqlite3
 
-# 1. 換回你的 API Key
-API_KEY = ""
+# API
+API_KEY = os.getenv('MY_API_KEY')
 url = f"https://data.moenv.gov.tw/api/v2/aqx_p_432?api_key={API_KEY}"
 
 print("1. 🚚 正在向環境部索取最新空氣資料...")
