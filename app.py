@@ -140,13 +140,23 @@ station_list = df['sitename'].unique()
 selected_station = st.selectbox("請選擇您想查詢的測站：", station_list)
 
 # 從大表格中，只篩選出使用者選到的那個測站的資料
-df_station = df[df['sitename'] == selected_station]
+df_station = df[df['sitename'] == selected_station].copy()
+
+# 1. 確保時間是由舊到新正確排序的
+df_station['publishtime'] = pd.to_datetime(df_station['publishtime'])
+df_station = df_station.sort_values('publishtime')
+
+# 2. 把冗長的時間 (2026/04/13 20:00:00) 簡化成更易讀的格式 (04-13 20:00)
+df_station['time_label'] = df_station['publishtime'].dt.strftime('%m-%d %H:%M')
+
 
 # 畫出折線圖
-fig_line = px.line(df_station, x='publishtime', y='aqi', 
+fig_line = px.line(df_station, x='time_label', y='aqi', 
                    title=f"{selected_station} 測站 AQI 歷史趨勢",
                    markers=True, # 顯示資料點
-                   labels={'publishtime': '更新時間', 'aqi': '空氣品質指標 (AQI)'})
+                   labels={'time_label': '時間', 'aqi': '空氣品質指標 (AQI)'})
+
+fig_line.update_xaxes(type='category', tickangle=45)
 st.plotly_chart(fig_line, use_container_width=True)
 
 st.divider() # 再畫一條分隔線
