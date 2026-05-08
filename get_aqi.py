@@ -12,6 +12,10 @@ response = requests.get(url)
 
 if response.status_code == 200:
     data = response.json()
+
+    if not data:
+        print("⚠️ 警告：API 回傳了空資料。可能是資料更新中，我們下一小時再試！")
+        exit() # 優雅撤退，不讓後面的程式碼崩潰
     
     # 【Transform: 資料轉換與清理】
     print("2. 🔪 資料抓取成功！交給 Pandas 整理成表格...")
