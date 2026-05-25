@@ -3,11 +3,11 @@ import pandas as pd
 import sqlite3
 import plotly.express as px
 
-# 1. 餐廳裝潢：設定網頁標題與版面寬度
+# 1. 設定網頁標題與版面寬度
 st.set_page_config(page_title="台灣空氣品質追蹤", layout="wide")
 st.title("TW 台灣空氣品質即時儀表板")
 
-# 2. 去冰箱拿菜：從資料庫讀取所有歷史資料
+# 2. 從資料庫讀取所有歷史資料
 def load_data():
     conn = sqlite3.connect('taiwan_aqi.db')
     df = pd.read_sql("SELECT * FROM aqi_records", conn)
@@ -79,7 +79,7 @@ st.divider()
 # =========================================================
 
 
-# 3. 擺盤上桌：將最新資料切成左右兩半 (保留原本的功能)
+# 將最新資料切成左右兩半
 col1, col2 = st.columns(2)
 
 with col1:
@@ -103,13 +103,13 @@ st.divider()
 # ================= 2. 縣市平均值進階運算 (Data Aggregation) =================
 st.subheader("📊 各縣市空氣品質平均值")
 
-# 使用 Pandas 強大的 groupby 功能：
+# 使用 Pandas 的 groupby 功能：
 # 1. 依照 'county' (縣市) 分組
 # 2. 針對 'aqi' 欄位計算平均值 (mean)
 # 3. reset_index() 是為了讓結果變回乾淨的表格
 df_county_avg = df_filtered.groupby('county')['aqi'].mean().reset_index()
 
-# 為了美觀，我們將平均值四捨五入到小數點第一位
+# 將平均值四捨五入到小數點第一位
 df_county_avg['aqi'] = df_county_avg['aqi'].round(1)
 
 # 將結果依照 AQI 由大到小排序 (最差的在前)
@@ -132,7 +132,7 @@ st.divider()
 # =========================================================================
 
 
-# ================= 新增：歷史趨勢查詢區塊 =================
+# ================= 歷史趨勢查詢區塊 =================
 st.subheader("📈 單一測站歷史趨勢查詢")
 
 # 建立一個下拉式選單，把所有測站名稱列出來讓使用者選
