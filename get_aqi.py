@@ -4,7 +4,7 @@ import pandas as pd
 import sqlite3
 
 # API
-API_KEY = os.getenv('MY_API_KEY')
+API_KEY = os.getenv('MY_API_KEY', 'f1fb06c3-08a8-433a-a9cd-c6466b9809a9')
 url = f"https://data.moenv.gov.tw/api/v2/aqx_p_432?api_key={API_KEY}"
 
 print("1. 🚚 正在向環境部索取最新空氣資料...")
@@ -12,11 +12,8 @@ response = requests.get(url)
 
 if response.status_code == 200:
     data = response.json()
+    print(f"API 第一層的鑰匙有：{data}")
 
-    if not data:
-        print("⚠️ 警告：API 回傳了空資料。可能是資料更新中，我們下一小時再試！")
-        exit() # 優雅撤退，不讓後面的程式碼崩潰
-    
     # 【Transform: 資料轉換與清理】
     print("2. 🔪 資料抓取成功！交給 Pandas 整理成表格...")
     df = pd.DataFrame(data)
