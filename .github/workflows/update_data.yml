@@ -5,6 +5,9 @@ on:
     - cron: '27 * * * *' # 每小時執行一次
   workflow_dispatch:      # 允許我們手動點擊按鈕來測試
 
+permissions:
+  contents: write  
+
 jobs:
   build:
     runs-on: ubuntu-latest
